@@ -31,7 +31,7 @@ Here is a list of valid Basilisk commands and what they do:
 
 + | Pops the top value in stack as A, pushes the absolute value of A.
 
-+ r Pops the top two values in stack as A and B, pushes a random integer between B - 1 and A + 1.
++ @ Pops the top two values in stack as A and B, pushes a random integer between B - 1 and A + 1.
 
 
 + i(a/r) Takes user input given at the beginning of the program. If a exists, reads the entire input and pushes it as a string. If r exists, resets the input. Otherwise, reads the first item in the input (items are separated by spaces) and pushes it as a string.
@@ -43,16 +43,16 @@ Here is a list of valid Basilisk commands and what they do:
 
 + = Pops top 2 values in stack as A and B, pushes 1 if B = A and 0 otherwise. If k exists, keeps the top two values on stack.
 
-+ \> If the top of the stack is not a string, pops top 2 values in stack as A and B, pushes 1 if B > A and 0 otherwise. If the top of the stack is a string, cuts the last k letters off of the string and replaces the top of the stack with the result.
++ \> If the top of the stack is not a string, pops top 2 values in stack as A and B, pushes 1 if B > A and 0 otherwise. If the top or next to top of the stack is a string, with N as an integer in the first two items in the stack, cuts N letters off the string and pushes the result, popping the number and original string.
 
-+ < Pops top 2 values in stack as A and B, pushes 1 if B < A and 0 otherwise. If the top of the stack is a string, cuts the first k letters off of the string and replaces the top of the stack with the result.
++ < Pops top 2 values in stack as A and B, pushes 1 if B < A and 0 otherwise. If the top or next to top of the stack is a string, with N as an integer in the first two items in the stack, cuts the string starting from N letters and pushes the result, popping the number and original string.
 
 + ! Pops top value in stack as A, pushes 0 if A is nonzero and 1 otherwise. If k exists, keeps top value on stack.
 
 
 + :X With X as a capital character, defines a position in the code as X.
 
-+ gX With X as a capital character, jumps to predefined position X in the code and continues executing code from there.
++ gX With X as a capital character, if the top of the stack is nonzero, jumps to predefined position X in the code and continues executing code from there.
 
 + s Pops top value in stack as A, if A is nonzero, pops top value in stack as B and does not execute next B characters in the code.
 
@@ -90,7 +90,7 @@ Here is a list of valid Basilisk commands and what they do:
 
 + v(X) If X exists, inserts a newline after every X characters in the top of the stack. Otherwise, inserts a newline after each character in the top of the stack.
 
-+ l Pushes the length of the top of the stack.
++ l Pops the top value in stack as A, pushes the length of A.
 
 + ~ Pops top 2 strings on stack as A and B. Pushes how many of A there are in B.
 
