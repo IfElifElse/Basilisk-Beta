@@ -8,37 +8,66 @@ except:
 code = open(file)
 program = code.read()
 program = list(program)
-try: stdin = sys.argv[2].split(" ")
-except: pass
+stdin = []
+try:
+  for i in range(2,len(sys.argv)):
+    stdin.append(sys.argv[i])
+except:
+  pass
 
 debug = 1
 
+if debug == 1 and stdin != []:
+  try:
+    print(stdin)
+  except:
+    pass
+
 stack = []
 variables = {}
-codeptr = 0-1
+codeptr = 0
 cmnd = 0
+stop = 0
+begin = 1
+funcvar = 0
+stack0 = 0
 
-def forward():
-  global codeptr, cmnd
-  codeptr += 1
-  cmnd = program[codeptr]
+def forward(var):
+  global codeptr, cmnd, stop, begin, variables, funcvar
+  if var == 0:
+    codeptr += 1
+    if begin == 1:
+      begin = 0
+      codeptr = 0
+    if len(program) > codeptr:
+      cmnd = program[codeptr]
+    else:
+      stop = 1
+  if var == 1:
+    codeptr += 1
+    cmnd = variables[funcvar][codeptr]
+  if var == 2:
+    codeptr += 1
+    cmnd = stack0[codeptr]
   if debug == 1:
     print(codeptr, cmnd)
 
-def backward():
+def backward(var):
   global codeptr, cmnd
-  codeptr -= 1
-  cmnd = program[codeptr]
+  if var == 0:
+    codeptr -= 1
+    cmnd = program[codeptr]
+  if var == 1:
+    codeptr -= 1
+    cmnd = variables[funcvar][codeptr]
+  if var == 2:
+    codeptr += 1
+    cmnd = stack[0][codeptr]
   if debug == 1:
     print(codeptr, cmnd)
 
-def debug(string):
-  global debug
-  if debug == 1:
-    print(string)
-
-def execute(code):
-  global stack, variables, codeptr
+def execute(code, var):
+  global stack, variables, codeptr, cmnd, stdin, funcvar, stack0
 
   #Increment
   if code == ")":
@@ -48,102 +77,101 @@ def execute(code):
     stack[0] -= 1
   #Addition
   if code == "+":
-    debug("add")
     stack[0] = stack[1] + stack[0]
     stack.pop(1)
   #Subtraction
   if code == "-":
-    debug("subtract")
     stack[0] = stack[1] - stack[0]
     stack.pop(1)
   #Multiplication
   if code == "*":
-    debug("multiply")
     stack[0] = stack[1] * stack[0]
     stack.pop(1)
   #Division
   if code == "/":
-    debug("divide")
     stack[0] = stack[1] / stack[0]
     stack.pop(1)
   #Modulus
   if code == "%":
-    debug("mod")
     stack[0] = stack[1] % stack[0]
+    stack.pop(1)
   #Exponentiation
   if code == "^":
-    debug("power")
-    forward()
-    for cmnd - 1:
-      stack[0] *= stack[0]
+    forward(var)
+    exponent = stack[0]
+    stack.pop(0)
+    base = stack[0]
+    for i in range(exponent-1):
+      stack[0] *= base
   #Absolute
   if code == "|":
-    debug("absolute")
     stack[0] = abs(stack[0])
   #Random integer
   if code == "@":
-    debug("rand")
     stack[0] = randint(stack[1], stack[0])
     stack.pop(1)
     
   #Input
   if code == "i":
-    debug("input")
-    forward()
+    forward(var)
     if cmnd == "a":
       stack.insert(0, " ".join(stdin))
-    if cmnd == "r":
+    elif cmnd == "r":
       try: stdin = sys.argv[2].split(" ")
       except: pass
     else:
       stack.insert(0, stdin[0])
       stdin.pop(0)
-      backward()
+      backward(var)
   #Output
   if code == "o":
-    debug("output")
-    sys.stdout.write(stack[0])
-    stack.pop[0]
+    sys.stdout.write(str(stack[0]))
+    stack.pop(0)
   #Newline
   if code == "n":
-    debug("newline")
     stack.insert(0, "\n")
 
   #Equal
   if code == "=":
-    debug("equal")
     if stack[1] == stack[0]:
       stack[0] = 1
     else:
       stack[0] = 0
     stack.pop(1)
   #More
-  if code == ">" and type(stack[0]) == type(1):
-    debug("greater")
-    if stack[1] > stack[0]:
-      stack[0] = 1
-    else:
-      stack[0] = 0
-    stack.pop(1)
-  if code == ">" and type(stack[0]) == type(""):
-    forward()
-    debug("cut")
-    stack.insert(0,(stack[1] < stack[0]))
+  if code == ">":
+    if type(stack[0]) == type(1) and type(stack[1]) == type(1):
+      if stack[1] > stack[0]:
+        stack[0] = 1
+      else:
+        stack[0] = 0
+      stack.pop(1)
+    elif type(stack[0]) == type(""):
+      forward(var)
+      stack[0] = stack[0][stack[1]:]
+      stack.pop(1)
+    elif type(stack[1]) == type(""):
+      forward(var)
+      stack[0] = stack[1][stack[0]:]
+      stack.pop(1)
   #Less
-  if code == "<" and type(stack[0]) == type(1):
-    debug("lesser")
-    if stack[1] < stack[0]:
-      stack[0] = 1
-    else:
-      stack[0] = 0
-    stack.pop(1)
-  if code == "<" and type(stack[0]) == type(""):
-    forward()
-    debug("cut")
-    stack[0] = stack[0][:pan]
+  if code == "<":
+    if type(stack[0]) == type(1) and type(stack[1]) == type(1):
+      if stack[1] < stack[0]:
+        stack[0] = 1
+      else:
+        stack[0] = 0
+      stack.pop(1)
+    elif type(stack[0]) == type(""):
+      forward(var)
+      stack[0] = stack[0][:stack[1]]
+      stack.pop(1)
+    elif type(stack[1]) == type(""):
+      forward(var)
+      stack[0] = stack[1][:stack[0]]
+      stack.pop(1)
   #Not
   if code == "!":
-    debug("not")
     if stack[0] == 0:
       stack[0] = 1
     else:
@@ -151,251 +179,252 @@ def execute(code):
 
   #Position
   if code == ":":
-    debug(pos)
-    forward()
+    forward(var)
     variables[cmnd] = codeptr
   #Goto
   if code == "g":
-    forward()
-    debug("goto")
-    codeptr = variables[cmnd]
+    forward(var)
+    if stack[0] != 0:
+      codeptr = variables[cmnd]
   #Skip
   if code == "s":
-    debug("skip")
     if code[0] != 0:
-      stack.pop(0)
-      for stack[0]:
-        forward()
+      for i in range(stack[0]):
+        forward(var)
+    stack.pop(0)
   #For
   if code == "f":
-    forward()
-    debug(for)
+    forward(var)
     suspend = codeptr
-    codeptr = 0
-    for stack[0]:
-      variables[cmnd][codeptr] = cmd
-      execute(cmd)
-      codeptr += 1
+    funcvar = cmnd
+    stack0 = stack[0]
+    stack.pop(0)
+    ctrl = 0
+    for i in range(stack0):
+      ctrl += 1
+      if debug == 1:
+        print ctrl
+      codeptr = -1
+      while codeptr != len(variables[funcvar])-1:
+        forward(1)
+        execute(cmnd, 1)
     codeptr = suspend
-    forward()
+    forward(var)
   
   #Duplicate
   if code == "d":
-    debug("duplicate")
     stack.insert(0, stack[0])
   #Bury
   if code == "&":
-    forward()
-    debug("bury")
-    stack.insert(cmnd-1, stack[0])
+    forward(var)
+    stack.insert(int(cmnd), stack[0])
     stack.pop(0)
   #Pop
   if code == "p":
-    forward()
-    debug("pop")
+    forward(var)
     if cmnd in "0123456789":
-      for int(cmnd):
+      for i in range(int(cmnd)):
         stack.pop(0)
     else:
       stack.pop(0)
-      backward()
+      backward(var)
   #Sort
   if code == "$":
-    forward()
-    debug("sort")
+    forward(var)
     if cmnd == "a":
       stack = sorted(stack)
     else:
       stack[0] = "".join(sorted(list(stack[0])))
-      backward()
+      backward(var)
   #Clear
   if code == "x":
-    debug("clear")
     stack = []
 
   #Variable
   if code in variables:
-    debug("var")
-    debug("var is %s" % variables[code])
     stack.insert(0, variables[code])
   #Store init
   elif code in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-    debug("store")
     variables[code] = stack[0]
   #Store
   if code == "\\":
-    forward()
-    debug("store")
+    forward(var)
     variables[cmnd] = stack[0]
   #Function variable
   if code == "[":
-    debug("func")
-    forward()
+    forward(var)
     function = []
     while cmnd != "]":
       function.append(cmnd)
-      forward()
+      forward(var)
+    forward(var)
     variables[cmnd] = function
   #If
   if code == "?":
-    debug("if")
-    forward()
+    forward(var)
     if stack[0] != 0:
+      stack.pop(0)
       if cmnd in variables:
         suspend = codeptr
-        codeptr = 0
-        for len(variables[cmnd]):
-          variables[cmnd][codeptr] = cmd
-          execute(cmd)
-          codeptr += 1
+        codeptr = -1
+        funcvar = cmnd
+        while codeptr != len(variables[funcvar])-1:
+          forward(1)
+          execute(cmnd, 1)
         codeptr = suspend
       if cmnd == "[":
         funcctrl = 1
         while funcctrl != 0:
-          forward()
-          execute(cmnd)
+          forward(var)
+          execute(cmnd, 0)
           if cmnd == "[":
             funcctrl += 1
           if cmnd == "]":
             funcctrl -= 1
-      forward()
+        forward(var)
+      if cmnd == "[":
+        funcctrl = 1
+        while funcctrl != 0:
+          forward(var)
+          if cmnd == "[":
+            funcctrl += 1
+          if cmnd == "]":
+            funcctrl -= 1
+      forward(var)
     else:
+      stack.pop(0)
       if cmnd == "[":
         funcctrl = 1
         while funcctrl != 0:
-          forward()
+          forward(var)
           if cmnd == "[":
             funcctrl += 1
           if cmnd == "]":
             funcctrl -= 1
-      forward()
+      forward(var)
       if cmnd in variables:
         suspend = codeptr
-        codeptr = 0
-        for len(variables[cmnd]):
-          variables[cmnd][codeptr] = cmd
-          execute(cmd)
-          codeptr += 1
+        codeptr = -1
+        funcvar = cmnd
+        while codeptr != len(variables[funcvar])-1:
+          forward(1)
+          execute(cmnd, 1)
         codeptr = suspend
       if cmnd == "[":
         funcctrl = 1
         while funcctrl != 0:
-          forward()
-          execute(cmnd)
+          forward(var)
+          execute(cmnd, 0)
           if cmnd == "[":
             funcctrl += 1
           if cmnd == "]":
             funcctrl -= 1
 
-    #String
-    if code == "\"":
-      debug("str")
-      string = []
-      while cmnd != "\"":
-        forward()
-        string.append(cmnd)
-      debug("end str")
-      stack.insert(0, "".join(string))
-    #Convert to integer
-    if code == ".":
-      debug("conv int")
-      stack[0] = int(stack[0])
-    #Convert to string
-    if code == ",":
-      debug("conv str")
-      stack[0] = str(stack[0])
-    #Character
-    if code == "'":
-      forward()
-      debug("char")
-      stack.insert(0, str(cmnd))
-    #Concatenate
-    if code == "c":
-      forward()
-      debug("concat")
-      if cmnd == "n":
-            short1 = 0
-            short0 = 0
-            str0 = stack[0].split("\n")
-            str1 = stack[1].split("\n")
-            if len(str0) >= len(str1):
-                shorter = len(str1)
-                short1 = 1
-            else:
-                shorter = len(str0)
-                short0 = 1
-            conStr = []
-            for i in range(0, shorter):
-                conStr.append(str1[i] + str0[i])
-                if debug == 1:
-                    print conStr
-            stack.pop(0)
-            stack.pop(0)
-            stack.insert(0, "\n".join(conStr))
+  #String
+  if code == "\"":
+    string = []
+    forward(var)
+    while cmnd != "\"":
+      string.append(cmnd)
+      forward(var)
+    stack.insert(0, "".join(string))
+  #Convert to integer
+  if code == ".":
+    stack[0] = int(stack[0])
+  #Convert to string
+  if code == ",":
+    stack[0] = str(stack[0])
+  #Character
+  if code == "'":
+    forward(var)
+    stack.insert(0, str(cmnd))
+  #Concatenate
+  if code == "c":
+    forward(var)
+    if cmnd == "n":
+      short1 = 0
+      short0 = 0
+      str0 = stack[0].split("\n")
+      str1 = stack[1].split("\n")
+      if len(str0) >= len(str1):
+          shorter = len(str1)
+          short1 = 1
       else:
-        backward()
-        stack[0] = str(stack[1]) + str(stack[0])
-        stack.pop(1)
-    #Vertical
-    if code == "v":
-      forward()
-      debug("vert")
-      if cmnd in "0123456789":
-        vertstr = []
-        for i in range(0, len(stack[0]), int(vert)):
-          vertstr.append(stack[0][i:i+int(vert)])
-        vertstr = "\n".join(vertstr)
-        stack[0] = vertstr
-      else:
-        backward()
-        stack[0] = "\n".join(list(stack[0]))
-    #Length
-    if code == "l":
-      debug("len")
-      stack.insert(len(str(stack[0])))
-    #In
-    if code == "~":
-      stack[0] = stack[1].count(stack[0])
+          shorter = len(str0)
+          short0 = 1
+      conStr = []
+      for i in range(0, shorter):
+        conStr.append(str1[i] + str0[i])
+        if debug == 1:
+          print conStr
+      stack.pop(0)
+      stack.pop(0)
+      stack.insert(0, "\n".join(conStr))
+    else:
+      backward(var)
+      stack[0] = str(stack[1]) + str(stack[0])
       stack.pop(1)
+  #Vertical
+  if code == "v":
+    forward(var)
+    if cmnd in "0123456789":
+      vertstr = []
+      for i in range(0, len(stack[0]), int(cmnd)):
+        vertstr.append(stack[0][i:i+int(cmnd)])
+      vertstr = "\n".join(vertstr)
+      stack[0] = vertstr
+    else:
+      backward(var)
+      stack[0] = "\n".join(list(stack[0]))
+  #Length
+  if code == "l":
+    stack[0] = len(str(stack[0]))
+  #In
+  if code == "~":
+    stack[0] = stack[1].count(stack[0])
+    stack.pop(1)
 
-    #Integer
-    if code in "0123456789":
-      debug("number")
-      stack.insert(0, int(code))
+  #Integer
+  if code in "0123456789":
+    stack.insert(0, int(code))
       
-    #Execute
-    if code == "e":
-      debug("exec")
-      suspend = codeptr
-      codeptr = 0
-      stack[0] = list(stack[0])
-      for len(stack[0]):
-        stack[0][codeptr] = cmd
-        execute(cmd)
-        codeptr += 1
-      codeptr = suspend
+  #Execute
+  if code == "e":
+    suspend = codeptr
+    codeptr = -1
+    stack0 = list(stack[0])
+    stack.pop(0)
+    while codeptr != len(stack0)-1:
+      forward(2)
+      execute(cmnd, 2)
+    codeptr = suspend
 
-    #Debug
-    if code == "`":
-      debug("debug")
-      print(stack[0])
+  #Debug
+  if code == "`":
+    print(stack)
 
 while 1:
   forward(0)
-  if codeptr > len(program):
+  if stop != 1:
     try:
-      execute(cmnd)
+      execute(cmnd, 0)
     except:
       print "Error! Something went wrong with the command %s." % cmnd
       print "The stack looked like",stack,"when the error occured."
-      print "Here's the error:"
-      raise
+      if debug == 1:
+        raise
+      try:
+        raise
+      except IndexError:
+        print
+        print "The stack was probably empty."
       quit()
   else:
     break
-print "\n"
 
+stack = list(reversed(stack))
 for i in range(0, len(stack)):
   stack[i] = str(stack[i])
 print("".join(stack))
+print
       
