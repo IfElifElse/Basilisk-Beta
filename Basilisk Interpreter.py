@@ -147,11 +147,9 @@ def execute(code, var):
         stack[0] = 0
       stack.pop(1)
     elif type(stack[0]) == type(""):
-      forward(var)
       stack[0] = stack[0][stack[1]:]
       stack.pop(1)
     elif type(stack[1]) == type(""):
-      forward(var)
       stack[0] = stack[1][stack[0]:]
       stack.pop(1)
   #Less
@@ -163,11 +161,9 @@ def execute(code, var):
         stack[0] = 0
       stack.pop(1)
     elif type(stack[0]) == type(""):
-      forward(var)
       stack[0] = stack[0][:stack[1]]
       stack.pop(1)
     elif type(stack[1]) == type(""):
-      forward(var)
       stack[0] = stack[1][:stack[0]]
       stack.pop(1)
   #Not
@@ -257,21 +253,23 @@ def execute(code, var):
     while cmnd != "]":
       function.append(cmnd)
       forward(var)
-    forward(var)
-    variables[cmnd] = function
+    stack.insert(0, function)
   #If
   if code == "?":
     forward(var)
     if stack[0] != 0:
       stack.pop(0)
-      if cmnd in variables:
-        suspend = codeptr
-        codeptr = -1
-        funcvar = cmnd
-        while codeptr != len(variables[funcvar])-1:
-          forward(1)
-          execute(cmnd, 1)
-        codeptr = suspend
+      if cmnd != "[":
+        if cmnd in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+          suspend = codeptr
+          codeptr = -1
+          funcvar = cmnd
+          while codeptr != len(variables[funcvar])-1:
+            forward(1)
+            execute(cmnd, 1)
+          codeptr = suspend
+        else:
+          execute(cmnd, var)
       if cmnd == "[":
         funcctrl = 1
         while funcctrl != 0:
@@ -281,7 +279,7 @@ def execute(code, var):
             funcctrl += 1
           if cmnd == "]":
             funcctrl -= 1
-        forward(var)
+      forward(var)
       if cmnd == "[":
         funcctrl = 1
         while funcctrl != 0:
@@ -378,7 +376,7 @@ def execute(code, var):
       stack[0] = "\n".join(list(stack[0]))
   #Length
   if code == "l":
-    stack[0] = len(str(stack[0]))
+    stack.insert(0, len(str(stack[0])))
   #In
   if code == "~":
     stack[0] = stack[1].count(stack[0])
@@ -409,7 +407,7 @@ while 1:
     try:
       execute(cmnd, 0)
     except:
-      print "Error! Something went wrong with the command %s." % cmnd
+      print "Error! Something went wrong with the command \"%s\"." % cmnd
       print "The stack looked like",stack,"when the error occured."
       if debug == 1:
         raise
