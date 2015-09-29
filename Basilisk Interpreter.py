@@ -288,7 +288,6 @@ def execute(code, var):
             funcctrl += 1
           if cmnd == "]":
             funcctrl -= 1
-      forward(var)
     else:
       stack.pop(0)
       if cmnd == "[":
@@ -300,14 +299,17 @@ def execute(code, var):
           if cmnd == "]":
             funcctrl -= 1
       forward(var)
-      if cmnd in variables:
-        suspend = codeptr
-        codeptr = -1
-        funcvar = cmnd
-        while codeptr != len(variables[funcvar])-1:
-          forward(1)
-          execute(cmnd, 1)
-        codeptr = suspend
+      if cmnd != "[":
+        if cmnd in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+          suspend = codeptr
+          codeptr = -1
+          funcvar = cmnd
+          while codeptr != len(variables[funcvar])-1:
+            forward(1)
+            execute(cmnd, 1)
+          codeptr = suspend
+        else:
+          execute(cmnd, var)
       if cmnd == "[":
         funcctrl = 1
         while funcctrl != 0:
@@ -425,4 +427,3 @@ for i in range(0, len(stack)):
   stack[i] = str(stack[i])
 print("".join(stack))
 print
-      
