@@ -1,4 +1,4 @@
-Warning! Basilisk is in *beta* and is *highly buggy*! I miss a lot of things. If you use the interpreter, please send any complaints to bestc@brpsk12.org.
+Warning! Basilisk is in beta and is *highly buggy*! I miss a lot of things. If you use the interpreter, please send any complaints to bestc@brpsk12.org.
 
 # Basilisk
 Basil is a coding language based somewhat off of CJam. The interpreter, named `Basilisk Interpreter.py`, should be run with `python [file pathe to interpreter] [file path to .bsl file]`.
