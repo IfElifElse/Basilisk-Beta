@@ -1,3 +1,5 @@
+Warning! Basilisk is in *beta* and is *highly buggy*! I miss a lot of things. If you use the interpreter, please send any complaints to bestc@brpsk12.org.
+
 # Basilisk
 Basil is a coding language based somewhat off of CJam. The interpreter, named `Basilisk Interpreter.py`, should be run with `python [file pathe to interpreter] [file path to .bsl file]`.
 
@@ -75,7 +77,7 @@ Here is a list of valid Basilisk commands and what they do:
 
 + [Y]X With Y as a string of valid Basil code and X as a capital character, stores Y in X as a function.
 
-+ ?XY If the top value in stack is 0, executes function Y, otherwise executes function X.
++ ?XY If the top value in stack is 0, executes function Y, otherwise executes function X. X and/or Y can be pre-defined functions, single commands or a function defined within the command (enclosed in brackets).
 
 
 + "X" With X as a string, pushes X.
