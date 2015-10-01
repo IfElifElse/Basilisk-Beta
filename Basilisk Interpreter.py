@@ -15,7 +15,7 @@ try:
 except:
   pass
 
-debug = 1
+debug = 0
 
 if debug == 1 and stdin != []:
   try:
@@ -61,7 +61,7 @@ def backward(var):
     codeptr -= 1
     cmnd = variables[funcvar][codeptr]
   if var == 2:
-    codeptr += 1
+    codeptr -= 1
     cmnd = stack[0][codeptr]
   if debug == 1:
     print(codeptr, cmnd)
@@ -182,8 +182,8 @@ def execute(code, var):
     forward(var)
     if stack[0] != 0:
       codeptr = variables[cmnd]
-  #Skip
-  if code == "s":
+  #Jump
+  if code == "j":
     if code[0] != 0:
       for i in range(stack[0]):
         forward(var)
@@ -242,18 +242,29 @@ def execute(code, var):
   #Store init
   elif code in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
     variables[code] = stack[0]
+    if type(stack[0]) == type([]):
+      stack.pop(0)
   #Store
   if code == "\\":
     forward(var)
     variables[cmnd] = stack[0]
   #Function variable
   if code == "[":
+    if debug == 1:
+      print"Func begin"
     forward(var)
     function = []
-    while cmnd != "]":
+    funcctrl = 1
+    while funcctrl != 0:
       function.append(cmnd)
       forward(var)
+      if cmnd == "[":
+        funcctrl += 1
+      if cmnd == "]":
+        funcctrl -= 1
     stack.insert(0, function)
+    if debug == 1:
+      print"Func end"
   #If
   if code == "?":
     forward(var)
@@ -274,7 +285,7 @@ def execute(code, var):
         funcctrl = 1
         while funcctrl != 0:
           forward(var)
-          execute(cmnd, 0)
+          execute(cmnd, var)
           if cmnd == "[":
             funcctrl += 1
           if cmnd == "]":
@@ -314,7 +325,7 @@ def execute(code, var):
         funcctrl = 1
         while funcctrl != 0:
           forward(var)
-          execute(cmnd, 0)
+          execute(cmnd, var)
           if cmnd == "[":
             funcctrl += 1
           if cmnd == "]":
@@ -398,6 +409,45 @@ def execute(code, var):
       forward(2)
       execute(cmnd, 2)
     codeptr = suspend
+
+  #String manipulation (s)
+  if code == "s":
+    forward(var)
+    #Insert
+    if cmnd == "i":
+      modString = list(stack[2])
+      modString.insert(stack[0]-1, stack[1])
+      stack[0] = "".join(modString)
+      stack.pop(1)
+      stack.pop(1)
+    #Replace
+    if cmnd == "r":
+      modString = list(stack[2])
+      modString[stack[0]] = stack[1]
+      stack[0] = "".join(modString)
+      stack.pop(1)
+      stack.pop(1)
+    #Position
+    if cmnd == "p":
+      stack[0] = stack[1].index(stack[0] + 1)
+      stack.pop(1)
+    #Get
+    if cmnd == "g":
+      stack[0] = stack[1][stack[0] - 1]
+    #Remove
+    if cmnd == "r":
+      modString = list(stack[1])
+      if type(stack[0]) == type(1):
+        modString.pop(stack[0]-1)
+      elif type(stack[0]) == type(""):
+        forward(var)
+        if cmnd == "o":
+          modString.pop(modString.index(stack[0]))
+#        else:
+#          backward(var)
+#          for i in modString:
+#            if modString[i]
+    
 
   #Debug
   if code == "`":
