@@ -429,24 +429,11 @@ def execute(code, var):
       stack.pop(1)
     #Position
     if cmnd == "p":
-      stack[0] = stack[1].index(stack[0] + 1)
+      stack[0] = stack[1].index(stack[0])
       stack.pop(1)
     #Get
     if cmnd == "g":
-      stack[0] = stack[1][stack[0] - 1]
-    #Remove
-    if cmnd == "r":
-      modString = list(stack[1])
-      if type(stack[0]) == type(1):
-        modString.pop(stack[0]-1)
-      elif type(stack[0]) == type(""):
-        forward(var)
-        if cmnd == "o":
-          modString.pop(modString.index(stack[0]))
-#        else:
-#          backward(var)
-#          for i in modString:
-#            if modString[i]
+      stack[0] = stack[1][stack[0]]
     
 
   #Debug
@@ -477,3 +464,4 @@ for i in range(0, len(stack)):
   stack[i] = str(stack[i])
 print("".join(stack))
 print
+      
