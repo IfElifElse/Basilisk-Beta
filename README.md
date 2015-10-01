@@ -101,6 +101,13 @@ Here is a list of valid Basilisk commands and what they do:
 + e Executes the top of the stack as Basil code.
 
 + ` Prints the entire stack as a list (used for debugging).
+ 
+
++ s This command requires a second modifier. A list below denotes all possible modifiers and explains their function.
++     i Pops the top three values from stack as A, B and C, inserts string B at position C in string A, pushes modified A.
++     r Pops the top three values from stack as A, B and C, replaces the Cth character in string A with character B, pushes modified A.
++     g Pops the top value from stack as A, pushes the Ath character in top of stack.
++     p Pops the top value from stack as A, pushes the position of character A in top of stack. This is 0 indexed.
 
 
 Any other character does nothing.
