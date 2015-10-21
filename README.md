@@ -25,7 +25,7 @@ Here is a list of valid Basilisk commands and what they do:
 
 + \* Pops the top 2 values in stack as A and B, pushes B * A. String compatible.
 
-+ / Pops the top 2 values in stack as A and B, pushes B / A as an integer.
++ / If the top value in the stack is an integer, pops the top 2 values in stack as A and B, pushes B / A as an integer. Otherwise, if the top value in the stack is a string, pops the top two values in the stack as A and B, then pushes B split by A in the order B was as the original string.
 
 + % Pops the top 2 values in stack as A and B, pushes the remainder of B / A.
 
