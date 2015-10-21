@@ -21,6 +21,7 @@ if debug == 1 and stdin != []:
   try:
     print(stdin)
   except:
+    "".append(stdin)
     pass
 
 stack = []
@@ -89,8 +90,15 @@ def execute(code, var):
     stack.pop(1)
   #Division
   if code == "/":
-    stack[0] = stack[1] / stack[0]
-    stack.pop(1)
+    if type(stack[0]) = type(""):
+      split = stack[1].split(stack[0])
+      stack.pop(1)
+      for i in range(len(split) - 1):
+        stack.insert(0, split[i])
+    else:
+      stack[0] = stack[1] / stack[0]
+      stack.pop(1)
+    
   #Modulus
   if code == "%":
     stack[0] = stack[1] % stack[0]
@@ -181,7 +189,10 @@ def execute(code, var):
   if code == "g":
     forward(var)
     if stack[0] != 0:
-      codeptr = variables[cmnd]
+      if code == "s":
+        codeptr = 0
+      else:
+        codeptr = variables[cmnd]
   #Jump
   if code == "j":
     if code[0] != 0:
@@ -206,7 +217,33 @@ def execute(code, var):
         execute(cmnd, 1)
     codeptr = suspend
     forward(var)
-  
+  #While
+  if code == "w":
+    forward()
+    elif cmnd == "[":
+      whilectrl = []
+      funcctrl = 1
+      while funcctrl != 0:
+        whilectrl.append[cmnd]
+    def test():
+      if cmnd in variables:
+        whilectrl = variables[cmnd]
+      else:
+        suspend = codeptr
+        codeptr = -1
+        while codeptr != len(whilectrl)-1:
+          forward(2)
+          execute(cmnd, 2)
+        return stack[0]
+    codeptr = suspend
+    forward()
+    beginLoop = codeptr
+    while test() != 0:
+      codeptr = beginLoop
+      while cmnd != "]":
+        forward(0)
+        execute(cmnd, 0)
+
   #Duplicate
   if code == "d":
     stack.insert(0, stack[0])
@@ -434,6 +471,19 @@ def execute(code, var):
     #Get
     if cmnd == "g":
       stack[0] = stack[1][stack[0]]
+    #Remove
+    if cmnd == "x":
+      modString = list(stack[1])
+      if type(stack[0]) == type(1):
+        modString.pop(stack[0]-1)
+      elif type(stack[0]) == type(""):
+        forward(var)
+        if cmnd == "o":
+          modString.pop(modString.index(stack[0]))
+#        else:
+#          backward(var)
+#          for i in modString:
+#            if modString[i]
     
 
   #Debug
@@ -464,4 +514,3 @@ for i in range(0, len(stack)):
   stack[i] = str(stack[i])
 print("".join(stack))
 print
-      
